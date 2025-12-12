@@ -1,0 +1,28 @@
+simulation:
+  name: rahu
+  start_date: 1981-01-01
+  end_date: 2018-12-31
+  output_path: ../mosart-output
+  
+grid:
+  path: ../mosart-input/mosart_new.nc
+  land:
+    path: ../mosart-input/land_new.nc
+
+runoff:
+  read_from_file: true
+  path: ../mosart-input/jules_runoff.nc
+  longitude: lon
+  latitude: lat
+  time: time
+  variables:
+    surface_runoff: surf_roff
+    subsurface_runoff: sub_surf_roff
+
+water_management:
+  enabled: false
+  demand:
+    read_from_file: true
+    path: demand.nc
+  reservoirs:
+    path: reservoirs.nc
