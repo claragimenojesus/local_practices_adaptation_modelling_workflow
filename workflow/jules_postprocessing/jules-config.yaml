@@ -1,0 +1,67 @@
+jules:
+  name: 
+  start_year: 1980
+  end_year: 2018
+  suite: u-cd588
+  id_stem: JULES_vn6.1
+  job_name: S2
+  profile_name: daily_hydrology
+  jules_output_directory: JULES_output/u-cd588
+  gridfile: projects/rahu/ancil/netcdf/jules_land_frac_ESA_rahu.nc
+  y_dim_name: lat
+  x_dim_name: lon
+  mask_var_name: land_frac
+  soil_dim_name: soil
+  tile_dim_name: tile
+  pft_dim_name: pft
+
+regrid_jules_output:
+  output_directory: projects/rahu/jules-output
+  file_suffix: 2D
+  
+resample_jules_output:
+  input_directory: projects/rahu/jules-output
+  output_directory: projects/rahu/jules-output
+  xmin: -74
+  xmax: -70
+  ymin: -16
+  ymax: -12
+  resolution: 05min
+  input_file_suffix: 2D
+  output_file_suffix: 2D.regrid
+
+aggregate_jules_output:
+  input_directory: projects/rahu/jules-output
+  output_directory: projects/rahu/jules-output
+  input_file_suffix: 2D
+
+annual_mean_runoff:
+  input_directory: projects/rahu/jules-output/
+  input_file_suffix: 2D.regrid
+  output_filename: projects/rahu/jules-output/jules_annual_mean_runoff.nc
+
+combined_runoff:
+  input_directory: projects/rahu/jules-output
+  input_file_suffix: 2D.regrid
+  output_filename: projects/rahu/mosart-input/jules_runoff.nc
+
+mosart:
+  merit_hydro_directory: /mnt/scratch/scratch/data/MERIT/hydro
+  merit_ihu_directory: /mnt/scratch/scratch/data/MERIT_IHU
+  geomorpho90m_directory: /mnt/scratch/scratch/data/geomorpho90m  
+  aux_directory: aux
+  mean_annual_runoff: projects/rahu/jules-output/jules_annual_mean_runoff.nc
+  mean_annual_runoff_varname: runoff
+  xmin: -74
+  xmax: -70
+  ymin: -16
+  ymax: -12
+  resolution: 05min
+  outlet_x: -72.6271
+  outlet_y: -13.0045
+  merit_scale_factor: 300
+  grass_location: grassdata/latlong
+  grass_mapset: mosart
+  input_directory: projects/rahu/jules-output
+  input_file_suffix: 2D.regrid
+  output_directory: projects/rahu/mosart-input
