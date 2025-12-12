@@ -1,0 +1,41 @@
+# Worflow:
+
+# 1. set up vilcanota DEM, generate flow accumulation map
+# 2. generate a drainage network of the major rivers by choosing a threshold of the accumulated area (essentially, if (accumulated area > 0) then pixel is a major river. This needs a bit of trial and error, and at what elevation and river size we think groundwater is resurfacing
+# 3. then use a flow tracing algorithm to determine the flow distance between all gridcells and the closest downstream "major river" cell downstream.
+# 4. Make histogram of the obtained distances.
+# 5. Convolute deep recharge contribution to the transect through the distance histogram to "shift" it downstream
+                                                                                                      
+                                                                                                      
+# in GRASS:
+#1. Reproject DEM and related raster layers into projected coordinate system with units in meters (otherwise the r.stream.distance script will not work
+
+# Export original DEM from GRASS to GeoTIFF
+r.out.gdal input=dem_filled output=/path/to/dem_filled.tif format=GTiff --overwrite
+
+# Reproject DEM to UTM Zone 19S (EPSG:32719) using GDAL
+gdalwarp -t_srs EPSG:32719 /path/to/dem_filled.tif /path/to/dem_filled_utm.tif
+
+# Create a new GRASS Location using the UTM-reprojected DEM
+grass -c /path/to/dem_filled_utm.tif /path/to/new_location_utm
+
+# Import the UTM DEM into GRASS
+r.in.gdal input=/path/to/dem_filled_utm.tif output=dem_filled_utm
+
+# Set GRASS region to match DEM
+g.region raster=dem_filled_utm
+
+# 2. Set computation region to UTM DEM
+
+g.region raster=dem_filled_utm -p
+
+# 3. Calculate depresionless DEM, flow direction with D8 format, flow accumulation and stream network for different thresholds (implemented for thres=200,500,1000, 10000,20000)
+# this needs to be iterated, depending on what stream network we think is more appropriate. We eneded up going with 20,000 which gave us a mean distance to main river stream of 10km
+r.watershed -s elevation=dem_filled_utm threshold=1000 drainage=flow_dir accumulation=flow_accum stream=stream_1000 –-overwrite
+
+# 5. Calculate distance to river - Output raster in meters
+
+r.stream.distance stream_rast=stream_1000 direction=flow_dir distance=dist_to_river_1000 --overwrite
+
+ # then process results in python! 
+                                                                                                      
