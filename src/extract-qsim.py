@@ -6,12 +6,10 @@ import re
 import xarray as xr
 import sys
 
-#OUTDIR = '/rds/general/user/cg2117/ephemeral/mosart-output/u-cz655_final'
 OUTDIR = str(os.environ['MOSART_OUTPUT'])
 NBS = str(os.environ['NBS'])
 SCENARIO_SH = str(os.environ['SCENARIO_SH'])
 SC = str(os.environ['SC'])
-#SC = re.findall('5/(.*)',SCENARIO_SH)[0]
 
 OUTLET_X_km105=-72.5336
 OUTLET_Y_km105=-13.1831
