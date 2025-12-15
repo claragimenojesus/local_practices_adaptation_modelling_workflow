@@ -18,7 +18,6 @@ NBS = str(os.environ['NBS'])
 SCENARIO_SH = str(os.environ['SCENARIO_SH'])
 SC= str(os.environ['SC'])
 
-#SC = re.findall('5/(.*)',SCENARIO_SH)[0]
 ## unit hydrograph
 
 def unit_hydro(V,k,n,t,er):
@@ -39,7 +38,6 @@ def unit_hydro(V,k,n,t,er):
     uh = np.array(V/(k*gamma(n))*np.multiply(np.exp(-t/k),np.power((t/k),n-1)))
     uh = uh/np.sum(uh)
 
-    # from Ana Mijic as from Anthony script
     m = er.size
     r = t.size
     n = r+m-1
@@ -51,8 +49,6 @@ def unit_hydro(V,k,n,t,er):
 
     return [DGW, uh]
 
-# k0 = 18.59720523 for KM105, and k0= 22.32687392 for PISAC
-# n0 = 22.57835457 for KM105, and n0= 18.8277447 for PISAC
 k0_km105=18.59720523
 n0_km105=22.57835457
 k0_pisac=22.32687392
@@ -60,12 +56,10 @@ n0_pisac=18.8277447
 V=1
 
 ## load jules results, change accordingly
-#jules = xr.open_dataset(home+"/hydrodata/jules_runs/coupled/runoff_scaled_and_partitioned.nc",decode_coords="all")
-jules = xr.open_dataset(os.path.join(INPUT_DIRECTORY,NBS, INPUT_FILENAME),decode_coords="all") # MODIFY THIS DEPENDING ON HOW WE LOOP FOR BARIABLES
-
+jules = xr.open_dataset(os.path.join(INPUT_DIRECTORY,NBS, INPUT_FILENAME),decode_coords="all") 
 ## Change depending shapefile
-catchment_km105= gpd.read_file("/rds/general/user/cg2117/home/catchments/km105.shp")
-catchment_pisac = gpd.read_file("/rds/general/user/cg2117/home/catchments/PISAC.shp")
+catchment_km105= gpd.read_file(".../catchments/km105.shp")
+catchment_pisac = gpd.read_file(".../catchments/PISAC.shp")
 
 ## JULES gridded results as timeseries
 q_deep=jules.q_deep.rio.set_spatial_dims(x_dim="lon",y_dim="lat",inplace=True)
@@ -77,19 +71,12 @@ grid_area = grid_area.expand_dims("time")
 grid_area['lat']=q_deep['lat']
 grid_area['lon']=q_deep['lon']
 deep_total_ts = np.multiply(q_deep, grid_area[0,:,:]).sum(dim=("lat","lon"))/1000
-#deep_total_ts = q_deep.sum(dim=["lat","lon"])
-#deep_total_ts = deep_total_ts*83424939/1000 # think we should multiply by each gridcell area in the grid instead...
 
 q_deep_km105=q_deep.rio.clip(catchment_km105.geometry.apply(mapping),catchment_km105.crs,drop=False,all_touched=True)
 deep_km105_ts = np.multiply(q_deep_km105, grid_area[0,:,:]).sum(dim=("lat","lon"))/1000
-#deep_km105_ts = q_deep_km105.sum(dim=["lat","lon"])
-#deep_km105_ts=deep_km105_ts*83424939/1000 # multiplying by mean pixel area for 48x48 grid
 
 q_deep_pisac=q_deep.rio.clip(catchment_pisac.geometry.apply(mapping),catchment_pisac.crs,drop=False,all_touched=True)
 deep_pisac_ts = np.multiply(q_deep_pisac, grid_area[0,:,:]).sum(dim=("lat","lon"))/1000
-#deep_pisac_ts = q_deep_pisac.sum(dim=["lat","lon"])
-#deep_pisac_ts=deep_pisac_ts*83424939/1000 # multiplying by mean pixel area for 48x48 grid
-
 
 
 ## convolve timeseries
