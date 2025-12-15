@@ -24,17 +24,20 @@ HIST_OUTPUT = str(os.environ['HIST_OUTPUT_SH'])
 SCENARIO_SH_OUTPUT = str(os.environ['SCENARIO_OUTPUT_SH'])
 RC = str(os.environ['RC'])
 SC = str(os.environ['SCENARIO'])
+MASK = str(os.environ['MASK'])
+GRID_AREA = str(os.environ['GRID_AREA'])
 
 ## import jules runs (note this is 2000 to 2099)
-## scenario rcp45_ACCESS1-0
-#jules = xr.open_dataset(home+"/hydrodata/jules_runs/coupled_for_nbs/rcp85_ACCESS1-3_coupled_jules_oggm_00_99.nc",decode_coords="all")
 jules = xr.open_dataset(os.path.join(SCENARIO_SH_OUTPUT, RC+"_"+SC+"_degradation_coupled_jules_oggm_00_99.nc"), decode_coords="all")
 
 #mask >4000masl
-mask=xr.open_dataset("/rds/general/user/cg2117/home/netcdf/mask_4000m.nc")['frac']
+mask=xr.open_dataset(MASK)['frac']
+
+# cell area
+cell_area = xr.open_dataset(GRID_AREA)['area']
 
 ## load UH
-uh = pd.read_csv(home+'/unit_hydro.csv').fillna(0)
+uh = pd.read_csv(home+'/unit_hydro.csv').fillna(0) # Ochoa-Tocachi et al. (2019)
 uh["conv"]=uh["conv"]/uh["conv"].sum()
 
 area=xr.zeros_like(jules.surf_roff)
@@ -43,7 +46,7 @@ ET0=xr.zeros_like(jules.surf_roff)
 div_ratio=100 # 100% diversion scenario
 
 ## et area will vary linearly with the amount of water diverted
-et_ratio = 1.2E6/75 #75l/s equated to 1.2 km2 of greened area 
+et_ratio = 1.2E6/75 #75l/s equated to 1.2 km2 of greened area
 
 ## calculating diverted water
 diversion=np.multiply(jules.surf_roff,mask)
@@ -67,7 +70,7 @@ for i in range(jules.sizes["lon"]):
         for t in range(jules.sizes["time"]):
             if shallow_asnp[t,j,i] > 0:
                 shallow_asnp1[t:t+uh["conv"].size,j,i]+= shallow_asnp[t,j,i]*uh["conv"].values
-                
+
 
 
 #replace flow
