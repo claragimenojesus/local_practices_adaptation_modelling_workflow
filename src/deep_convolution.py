@@ -14,8 +14,18 @@ import geopandas as gpd
 from rasterio.mask import mask
 import rasterio
 
+CATCH_MASK_PATH = str(os.environ['CATCH_MASK_PATH'])
+DIST_TO_RIVER_PATH = str(os.environ['DIST_TO_RIVER_PATH'])
+JULES_OUTPUT = str(os.environ['JULES_OUTPUT'])
+RC = str(os.environ['RC'])
+NBS = str(os.environ['NBS'])
+HYD_COND = str(os.environ['HYD_COND'])
+RESAMPLED_BASINS = str(os.environ['RESAMPLED_BASINS'])
+OUTPUT_PATH = str(os.environ['OUTPUT_PATH'])
+
+
 # Import catchment mask
-catchment = gpd.read_file("/home/clara/rahu_data/catchments/cuenca_vilcanota_final.shp")
+catchment = gpd.read_file(CATCH_MASK_PATH)
 catchment_utm = catchment.to_crs(epsg=32719)
 
 # Import UH for temporal convolution
@@ -59,7 +69,7 @@ V=1
 # Using 20,000 threshold contributing cells for stream network
 # Load PDF for spatial convolution using 20k threshold
 
-with rasterio.open("/home/clara/dist_to_river_20000.tif") as src:
+with rasterio.open(DIST_TO_RIVER_PATH) as src:
     # 3. Mask (crop) raster to catchment
     out_image, out_transform = mask(src, catchment_utm.geometry, crop=True)
     out_meta = src.meta.copy()
@@ -74,18 +84,13 @@ hist_counts, bin_edges  = np.histogram(dist_km, bins=bin_edges)
 pdf = hist_counts / hist_counts.sum()
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
-# PErforming operations for future degradation rcp4.5 first
-
-# FUTURE DEGRADATION RCP4.5 - TAKING MEDIAN ACROSS ALL FUTURE SCENARIOS
-# Change for other NbS scenarios and rcp45 or rcp85 
-
-base_path = "/home/clara/project/NbS/jules-output/rcp45"
+base_path = os.path.join(JULES_OUTPUT, RC)
 gcm_list = sorted(os.listdir(base_path))
-filename_template = "rcp45_{gcm}_degradation_coupled_jules_oggm_00_99.nc"
+filename_template = os.path.join(RC,"_{gcm}_degradation_coupled_jules_oggm_00_99.nc")
 
-hyd_cond = xr.open_dataset("/home/jec18/gis_layer/groundwater/hydrogeo_k.nc").fillna(0)
+hyd_cond = xr.open_dataset(HYD_COND).fillna(0)
 
-resampled_dir = "/home/clara/NbS_paper/resampled_basins/"
+resampled_dir = RESAMPLED_BASINS
 n_basins=100
 area_m2 = 15675183.637074107 # m2
 
@@ -106,7 +111,7 @@ for idx, gcm in enumerate(gcm_list):
 
     file = xr.open_dataset(nc_path)[["surf_roff", "sub_surf_roff", "melt"]].sel(
         time=slice("2077-01-01", "2099-12-31"), drop=True
-    )
+    ) # selecting 2077 to allow for deep UH to calibrate (approx 2 years).
 
     # Repeat hydraulic conductivity over time
     hyd_cond0 = xr.zeros_like(file.sub_surf_roff)
@@ -172,4 +177,4 @@ fut_45_df = pd.DataFrame({
     'deep_vector': deep_vector
 })
 
-fut_45_df.to_csv("/home/clara/NbS_paper/transect_figures/fut45_dry_season_depth_df.csv", index=False)
+fut_45_df.to_csv(os.path.join(OUTPUT_PATH, NBS+"_"+RC+"_"+"dry_season_depth_df.csv"), index=False)
