@@ -18,10 +18,6 @@ SCENARIO_SH = str(os.environ['SCENARIO_SH'])
 HIST_OUTPUT = str(os.environ['HIST_OUTPUT_SH'])
 SCENARIO_SH_OUTPUT = str(os.environ['SCENARIO_OUTPUT_SH'])
 
-print(SCENARIO_SH)
-print(HIST_OUTPUT)
-print(SCENARIO_SH_OUTPUT)
-
 melt_d = pyreadr.read_r(SCENARIO_SH+'/daily_melt_gridded.rda')
 melt_d = melt_d['DFm']
 melt_d = melt_d.rename(({'dim_0':'time','dim_1':'lat','dim_2':'lon'}))
