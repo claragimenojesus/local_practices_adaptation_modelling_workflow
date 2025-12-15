@@ -7,20 +7,13 @@ import os
 
 INPUT_DIRECTORY = str(os.environ['INPUT_DIRECTORY'])
 INPUT_FILENAME = str(os.environ['INPUT_FILENAME'])
-# changing this to incorporate NBS
-#MOSART_MASK = str(os.environ['MOSART_MASK'])
 LAND_FRAC = str(os.environ['LAND_FRAC'])
 GRID_AREA = str(os.environ['GRID_AREA'])
-#MOSART_AREA = str(os.environ['MOSART_AREA']) # changes for NBS
 HYD_COND = str(os.environ['HYD_COND'])
-#OUTPUT_DIRECTORY = str(os.environ['OUTPUT_DIRECTORY']) # changes for NBS
-
-# adapting script to add NBS scenarios - 22/10/2024 CGJ
 NBS = str(os.environ['NBS'])
 MOSART_MASK = os.path.join(INPUT_DIRECTORY, NBS, 'land_new.nc')
 MOSART_AREA = os.path.join(INPUT_DIRECTORY, NBS, 'mosart_new.nc')
 OUTPUT_DIRECTORY = os.path.join(INPUT_DIRECTORY, NBS, 'coupled_scpar_runoff.nc')
-## end of changes - 22/10/2024
 
 def main():
     IN_FN = os.path.join(INPUT_DIRECTORY, NBS, INPUT_FILENAME)
