@@ -49,8 +49,6 @@ def unit_hydro(V,k,n,t,er):
 
     return [DGW, uh]
 
-# k0 = 18.59720523 for KM105, and k0= 22.32687392 for PISAC
-# n0 = 22.57835457 for KM105, and n0= 18.8277447 for PISAC
 k0_km105=18.59720523
 n0_km105=22.57835457
 k0_pisac=22.32687392
@@ -79,6 +77,7 @@ bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 # PErforming operations for future degradation rcp4.5 first
 
 # FUTURE DEGRADATION RCP4.5 - TAKING MEDIAN ACROSS ALL FUTURE SCENARIOS
+# Change for other NbS scenarios and rcp45 or rcp85 
 
 base_path = "/home/clara/project/NbS/jules-output/rcp45"
 gcm_list = sorted(os.listdir(base_path))
@@ -99,10 +98,6 @@ melt_matrix = np.zeros((n_basins, len(gcm_list)))
 deep_matrix = np.zeros((n_basins, len(gcm_list)))
 
 deep_dry_conv = np.zeros((n_basins,len(gcm_list)))
-
-#time_index = pd.to_datetime(hist.time.values)
-# Dry season mask
-#dry_mask = (time_index >= "2080-01-01") & (time_index <= "2099-12-31") & (time_index.month >=5) & (time_index.month <=11)
 
 for idx, gcm in enumerate(gcm_list):
     print(f"Processing scenario {idx+1}/30: {gcm}")
@@ -178,51 +173,3 @@ fut_45_df = pd.DataFrame({
 })
 
 fut_45_df.to_csv("/home/clara/NbS_paper/transect_figures/fut45_dry_season_depth_df.csv", index=False)
-
-distance = fut_45_df['distance']
-subsurface = fut_45_df['subsurface_vector']
-surface = fut_45_df['surf_vector']
-melt = fut_45_df['melt_vector']
-deep = fut_45_df['deep_vector']
-
-# Compute cumulative sums for stacking
-bottom = deep
-middle = bottom + subsurface
-top = middle + surface
-top2 = top + melt
-
-# Set up journal-compliant styling
-plt.rcParams.update({
-    "axes.labelsize": 10,
-    "axes.titlesize": 9,
-    "legend.fontsize": 9,
-    "xtick.labelsize": 9,
-    "ytick.labelsize": 9,
-})
-
-
-# Create figure
-fig, ax = plt.subplots(figsize=(12,7))  # Width = 180 mm, height adjustable
-
-# Plot stacked areas
-ax.fill_between(distance, 0, bottom, label='Deep sub-surface runoff', color='royalblue', alpha=0.8)
-ax.fill_between(distance, bottom, middle, label='Shallow sub-surface runoff', color='dodgerblue', alpha=0.8)
-ax.fill_between(distance, middle, top, label='Surface runoff', color='skyblue', alpha=0.8)
-ax.fill_between(distance, top, top2, label='Glacier melt', color='lightcoral', alpha=0.8)
-
-# Labels
-ax.set_xlabel('Distance from headwater (km)', size=10, labelpad=10)
-ax.set_ylabel('Runoff depth (mm d⁻¹)',size=10, labelpad=10)
-
-# Axis and grid
-ax.set_ylim(0, 1.1)
-ax.grid(True, linestyle='--', linewidth=0.4, alpha=0.6)
-
-
-# Legend
-ax.legend(loc='upper right', frameon=False, fontsize=10)
-
-# Save as high-resolution vector graphic
-plt.tight_layout()
-plt.title("BASELINE SCENARIO MEAN DRY SEASON FLUXES - RCP4.5 ENSEMBLE MEAN (2080-2100)", fontsize=11, weight="bold")
-plt.savefig("/home/clara/NbS_paper/transect_figures/fut45_dry_season_depth.png", dpi=600)  # or .svg
