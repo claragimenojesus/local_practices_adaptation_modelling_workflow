@@ -9,17 +9,17 @@ library(magrittr)
 library(MASS)
 
 # Read JULES_OGGM glacier center coordinates
-pts <- read.csv("/home/clara/rahu_data/JULES_OGGM/cmip_runs_combined_v3/latlon_532.csv")
+pts <- read.csv(".../latlon.csv")
 pts2 <- pts[,2:3]
 pts2 <- relocate(pts2, 'Longitude')
 pts2 <- as.matrix(pts2)
 
-dir_areas <- list.files('/home/clara/rahu_data/JULES_OGGM/cmip_runs_combined_v3', pattern="area_m2.csv", full.names=TRUE) # index 1 to 30 rcp45, and 31 to 60 rcp85
-dir_rcp45 <- list.dirs('/mnt/scratch2/clara/JULES_OGGM/rcp45')[-1]
-dir_rcp85 <- list.dirs('/mnt/scratch2/clara/JULES_OGGM/rcp85')[-1]
+dir_areas <- list.files('.../cmip_runs_combined_v3', pattern="area_m2.csv", full.names=TRUE) # index 1 to 30 rcp45, and 31 to 60 rcp85
+dir_rcp45 <- list.dirs('.../JULES_OGGM/rcp45')[-1]
+dir_rcp85 <- list.dirs('.../JULES_OGGM/rcp85')[-1]
 
 # Read JULES-hydro gridcell area size
-r <- raster("/home/clara/rahu_data/netcdf/gridcell_area_rahu_v2.nc")
+r <- raster(".../gridcell_area.nc")
 
 # Let's do the same for rcp85 scenarios
 for (i in 1:2) {
