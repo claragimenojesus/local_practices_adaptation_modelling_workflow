@@ -8,7 +8,7 @@ source activate mosart
 
 cd $PBS_O_WORKDIR
 
-export NBS=""
+export NBS="amunas_"
 
 CONFIG_FILE=$(ls -dv rahu-config_files_rcp45/* | head -n $PBS_ARRAY_INDEX | tail -n 1)
 MOSART_FILE=$(ls -dv config_rahu_files_rcp45/mosart* | head -n $PBS_ARRAY_INDEX | tail -n 1)
@@ -56,6 +56,9 @@ rm glacier_area_daily_v2.nc
 rm glacier_perc_daily.nc
 rm glacier_perc_daily_v2.nc
 rm rain_daily_kgm2s.nc
+
+echo "Running amunas script"
+python ${SRC_DIR}/amunas.py
 
 cd $PBS_O_WORKDIR
 echo "Resampling jules output"
