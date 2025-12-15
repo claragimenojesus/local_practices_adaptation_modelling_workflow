@@ -22,13 +22,13 @@ HIST_OUTPUT = str(os.environ['HIST_OUTPUT_SH'])
 SCENARIO_SH_OUTPUT = str(os.environ['SCENARIO_OUTPUT_SH'])
 RC= str(os.environ['RC'])
 SC = str(os.environ['SCENARIO'])
+NBS_MASK = str(os.environ['NBS_MASK'])
+GRID_AREA = str(os.environ['GRID_AREA'])
 
-## jules output. change accordingly
-#jules = xr.open_dataset(home+"/hydrodata/jules_runs/coupled_for_nbs/rcp85_ACCESS1-3_coupled_jules_oggm_00_99.nc",decode_coords="all").sel(time=slice("2000-01-01", "2018-12-31"))
 jules = xr.open_dataset(os.path.join(SCENARIO_SH_OUTPUT, RC+"_"+SC+"_degradation_coupled_jules_oggm_00_99.nc"), decode_coords="all")
 
 #mask >4000masl
-mask=xr.open_dataset("/rds/general/user/cg2117/home/netcdf/mask_4000m.nc")['frac']
+mask=xr.open_dataset(NBS_MASK)['frac']
 
 ### Qochas parameter relations derived from medians from a Sierra Azul small dataset.
 # We will produce linear spaces for storage volume but the range of storage volume would be delimited by the
@@ -44,12 +44,11 @@ vol_acc=202500/13729.72
 
 
 # cell area
-cell_area = xr.open_dataset("/rds/general/user/cg2117/home/netcdf/gridcell_area_rahu_v2.nc")['area']
+cell_area = xr.open_dataset(GRID_AREA)['area']
 
 ## masking cells where there exists flows over the entire time
 masking=jules.surf_roff.sum(dim="time")
 masking=masking.where(masking>0)
-
 
 
 qochas_cap=st_max
@@ -91,7 +90,3 @@ jules = jules.drop_vars(["melt","perc","rain","area","precip","rainfall","snowfa
 
 # Save netcdf
 jules.to_netcdf(os.path.join(SCENARIO_SH_OUTPUT, RC+"_"+SC+"_"+"qochas_harvesting_coupled_jules_oggm_00_99.nc"))
-
-
-#available_storage[counter,:]=St.sel(time=jules.surf_roff.time.dt.year.isin(np.arange(2080,2101)),drop=True).resample(time="ME").mean().groupby("time.month").mean().mean(dim=["lat","lon"])
-#et_month[counter,:]=ET.sel(time=jules.surf_roff.time.dt.year.isin(np.arange(2080,2101)),drop=True).resample(time="ME").mean().groupby("time.month").mean().mean(dim=["lat","lon"])
