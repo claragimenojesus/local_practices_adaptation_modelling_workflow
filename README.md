@@ -8,9 +8,9 @@ The scripts included are used after running vn6.1. JULES land-surface model usin
 ## Workflow order
 The workflow is to be run in the following order:
 1. JULES post-processing.
-2. (1mod) JULES post-processing including NbS model modifications to JULES outputs.
-3. Surface and sub-surface routing.
-4. Storage equivalent analysis.
+1a. (1mod) JULES post-processing including NbS model modifications to JULES outputs.
+2. Surface and sub-surface routing.
+3. Storage equivalent analysis.
 
 A full workflow template bash script (full_workflow_template.sh) is provided and designed to be run at Imperial's HPC where parallelization is done with a PBS routine (default in Imperial's HPC).
 
