@@ -47,7 +47,6 @@ def unit_hydro(V,k,n,t,er):
     uh = np.array(V/(k*gamma(n))*np.multiply(np.exp(-t/k),np.power((t/k),n-1)))
     uh = uh/np.sum(uh)
 
-    # from Ana Mijic as from Anthony script
     m = er.size
     r = t.size
     n = r+m-1
