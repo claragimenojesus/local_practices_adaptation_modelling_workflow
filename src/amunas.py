@@ -37,7 +37,7 @@ mask=xr.open_dataset(MASK)['frac']
 cell_area = xr.open_dataset(GRID_AREA)['area']
 
 ## load UH
-uh = pd.read_csv(home+'/unit_hydro.csv').fillna(0) # Extracted fr
+uh = pd.read_csv(home+'/unit_hydro.csv').fillna(0) # Ochoa-Tocachi et al. (2019)
 uh["conv"]=uh["conv"]/uh["conv"].sum()
 
 area=xr.zeros_like(jules.surf_roff)
