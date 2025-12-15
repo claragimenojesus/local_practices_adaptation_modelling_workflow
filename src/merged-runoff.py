@@ -34,24 +34,6 @@ def main():
     print(OUTPUT_FILENAME)
     subprocess.run(['cdo', 'mergetime', s, OUTPUT_FILENAME])
     
-        
-    # x = xr.open_mfdataset(fs)
-    # # # write this dataset as a single file - FAR TOO SLOW!!!
-    # # x_runoff = x[['surf_roff', 'sub_surf_roff', 'runoff']]
-    # # x_runoff.to_netcdf(os.path.join(OUTPUT_DIRECTORY, 'jules_runoff_' + str(START) + '_' + str(END) + '.nc'))
-    # # compute annual averages for hydrological variables
-    # jules_vars = [
-    #     'surf_roff', 'sub_surf_roff', 'runoff',
-    #     'precip', 'ecan_gb', 'elake', 'esoil_gb',
-    #     'fao_et0'
-    # ]        
-    # for var in jules_vars:
-    #     x[var] = x[var] * 60 * 60 * 24 / 1000  # kg m-2 s-1 -> m d-1
-    # # m d-1 -> m y-1
-    # x_year = x.groupby("time.year").sum(dim="time")
-    # x_annual_mean = x_year.mean(dim="year")
-    # x_annual_mean.to_netcdf(OUTPUT_FILENAME)
-    # x.close()
 
 if __name__ == '__main__':
     main()
